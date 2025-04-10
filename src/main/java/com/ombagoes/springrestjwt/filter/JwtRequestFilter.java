@@ -43,7 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        //try {
+        try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 log.info("read bearer(-)");
                 jwtToken = authorizationHeader.substring(7);
@@ -58,8 +58,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             }
             chain.doFilter(request, response);
-        /*}catch (Exception e){
+        }catch (Exception e){
             handlerExceptionResolver.resolveException(request, response, null, e);
-        }*/
+        }
     }
 }

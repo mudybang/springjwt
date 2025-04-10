@@ -1,6 +1,5 @@
 package com.ombagoes.springrestjwt.auth;
 
-import com.ombagoes.springrestjwt.auth.payload.AuthenticationRequest;
 import com.ombagoes.springrestjwt.role.RoleRepository;
 import com.ombagoes.springrestjwt.user.User;
 import com.ombagoes.springrestjwt.user.UserRepository;

@@ -2,6 +2,7 @@ package com.ombagoes.springrestjwt.user;
 
 import com.ombagoes.springrestjwt.role.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class User implements Serializable {
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Email is mandatory")
+    @Email
     private String email;
 
     @Column(nullable = false)

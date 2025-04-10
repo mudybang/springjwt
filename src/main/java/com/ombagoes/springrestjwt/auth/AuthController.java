@@ -1,9 +1,9 @@
 package com.ombagoes.springrestjwt.auth;
 
-import com.ombagoes.springrestjwt.auth.payload.AuthenticationRequest;
 import com.ombagoes.springrestjwt.user.User;
 import com.ombagoes.springrestjwt.user.UserRepository;
 import com.ombagoes.springrestjwt.util.JwtUtil;
+import com.ombagoes.springrestjwt.util.ValidationUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
+@RequestMapping("auth")
 @CrossOrigin("*")
 public class AuthController {
 
@@ -36,18 +35,17 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ValidationUtil validationUtil;
+
     @PostMapping("/register")
-    public ResponseEntity<Object> addNewUser(@Valid @RequestBody User userInfo, BindingResult result) {
-        StringBuilder builder = new StringBuilder();
-        List<FieldError> errors = result.getFieldErrors();
-        HttpStatus status=HttpStatus.OK;
+    public ResponseEntity<Object> addNewUser(@Valid @RequestBody User userInfo, BindingResult bindingResult) {
+        String validationMessage=validationUtil.doValidation(bindingResult);
         HashMap<String, Object> resultMap = new HashMap<>();
-        for (FieldError error : errors ) {
-            builder.append(error.getField()).append(" : ").append(error.getDefaultMessage()).append(", ");
-        }
-        if(!builder.isEmpty()) {
+        HttpStatus status=HttpStatus.OK;
+        if(!validationMessage.isEmpty()) {
             resultMap.put("success", false);
-            resultMap.put("message", builder.substring(0,builder.length() - 2));
+            resultMap.put("message", validationMessage);
             status=HttpStatus.BAD_REQUEST;
         }else{
             String message=authenticationService.signup(userInfo);
@@ -64,24 +62,35 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> createToken(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<Object> createToken(@Valid @RequestBody AuthenticationRequest request, BindingResult bindingResult) {
+        StringBuilder bindErrorBuilder = new StringBuilder();
+        List<FieldError> errors = bindingResult.getFieldErrors();
+        for (FieldError error : errors ) {
+            bindErrorBuilder.append(error.getField()).append(" : ").append(error.getDefaultMessage()).append(", ");
+        }
+        log.info(bindErrorBuilder.toString());
+        if(!bindErrorBuilder.isEmpty()) {
+            return new ResponseEntity<>(Map.of(
+                    "success"  , false,
+                    "message"  ,  bindErrorBuilder.substring(0,bindErrorBuilder.length() - 2)
+            ),HttpStatus.BAD_REQUEST);
+        }
         Long authenticatedUser = authenticationService.authenticate(request);
-
-        // Generate the token
-        HashMap<String, Object> resultMap = new HashMap<>();
         if(authenticatedUser>0){
             log.info("success");
+            // Generate the token
             String jwtToken = jwtUtil.generateToken(authenticatedUser, request.getUsername());
-            resultMap.put("success", true);
-            resultMap.put("jwtToken", jwtToken);
-            resultMap.put("username", request.getUsername());
-            return new ResponseEntity<>(resultMap,HttpStatus.OK);
+            return new ResponseEntity<>(Map.of(
+                    "success"  , true,
+                    "jwtToken"  , jwtToken,
+                    "username"  , request.getUsername()
+            ),HttpStatus.OK);
         }else{
             log.info("failed");
-            resultMap.put("success", false);
-            resultMap.put("message", "Bad Credential");
-            return new ResponseEntity<>(resultMap,HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(Map.of(
+                    "success"  , false,
+                    "message"  , "Bad Credential"
+            ),HttpStatus.UNAUTHORIZED);
         }
-
     }
 }
