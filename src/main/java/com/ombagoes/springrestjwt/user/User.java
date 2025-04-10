@@ -4,6 +4,7 @@ import com.ombagoes.springrestjwt.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class User implements Serializable {
 
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Name is mandatory")
+    @Pattern(regexp = "[a-zA-Z\\s]+$", message = "invalid name, char only")
     private String name;
 
     @Column(nullable = false, unique = true)
@@ -33,6 +35,7 @@ public class User implements Serializable {
     @NotBlank(message = "Password must fill.")
     private String password;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean enabled;
 
     @ManyToOne(fetch = FetchType.LAZY)

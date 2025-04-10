@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -63,16 +61,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> createToken(@Valid @RequestBody AuthenticationRequest request, BindingResult bindingResult) {
-        StringBuilder bindErrorBuilder = new StringBuilder();
-        List<FieldError> errors = bindingResult.getFieldErrors();
-        for (FieldError error : errors ) {
-            bindErrorBuilder.append(error.getField()).append(" : ").append(error.getDefaultMessage()).append(", ");
-        }
-        log.info(bindErrorBuilder.toString());
-        if(!bindErrorBuilder.isEmpty()) {
+        String validationMessage=validationUtil.doValidation(bindingResult);
+        if(!validationMessage.isEmpty()) {
             return new ResponseEntity<>(Map.of(
                     "success"  , false,
-                    "message"  ,  bindErrorBuilder.substring(0,bindErrorBuilder.length() - 2)
+                    "message"  ,  validationMessage
             ),HttpStatus.BAD_REQUEST);
         }
         Long authenticatedUser = authenticationService.authenticate(request);
