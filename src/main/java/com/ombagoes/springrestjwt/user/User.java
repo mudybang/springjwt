@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -41,4 +42,20 @@ public class User implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Column(name = "created_at")
+    private Date createdAt;
+
+    @PrePersist
+    public void addTimestamp() {
+        createdAt = new Date();
+    }
+
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    @PreUpdate
+    public void updateTimestamp() {
+        updatedAt = new Date();
+    }
 }
