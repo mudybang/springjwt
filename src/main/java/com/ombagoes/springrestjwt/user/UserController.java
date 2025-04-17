@@ -81,4 +81,19 @@ public class UserController {
             }
         }
     }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<?> delete(){
+        HashMap<String, Object> resultMap = new HashMap<>();
+        String message=userService.deleteUser();
+        if(message.isEmpty()){
+            resultMap.put("success", true);
+            resultMap.put("message", "Update success.");
+            return new ResponseEntity<>(resultMap, HttpStatus.OK);
+        }else{
+            resultMap.put("success", false);
+            resultMap.put("message", message);
+            return new ResponseEntity<>(resultMap, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.ombagoes.springrestjwt.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ombagoes.springrestjwt.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -39,7 +40,8 @@ public class User implements Serializable {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean enabled;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("users")//avoid looping
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
     private Role role;
 

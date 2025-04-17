@@ -38,4 +38,19 @@ public class UserService {
         }
         return "User not exist.";
     }
+    public String deleteUser() {
+        Authentication authenticationToken = SecurityContextHolder.getContext().getAuthentication();
+        String username = authenticationToken.getName();
+        Optional<User> userData=getUser(username);
+        if (userData.isPresent()) {
+            User _user = userData.get();
+            try {
+                userRepository.delete(_user);
+            } catch (Exception e) {
+                return e.getCause().getCause().getMessage();
+            }
+            return "";
+        }
+        return "User not exist.";
+    }
 }
