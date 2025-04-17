@@ -2,8 +2,10 @@ package com.ombagoes.springrestjwt.user;
 
 import com.ombagoes.springrestjwt.auth.CustomUserDetailsService;
 import com.ombagoes.springrestjwt.user.dtos.UpdateProfileDto;
+import com.ombagoes.springrestjwt.util.JwtUtil;
 import com.ombagoes.springrestjwt.util.ValidationUtil;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,11 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@Slf4j
 public class UserController {
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
@@ -53,10 +59,18 @@ public class UserController {
         resultMap.put("success", true);
         resultMap.put("user", Map.of(
             "username"  , me.orElseThrow().getEmail(),
-            "role"  , me.orElseThrow().getRole().getId(),
-            "token", authenticationToken.getCredentials()
+            "role"  , me.orElseThrow().getRole().getId()
         ));
+        return new ResponseEntity<>(resultMap, HttpStatus.OK);
+    }
 
+    @GetMapping("/refresh")
+    public ResponseEntity<?> refreshToken() {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        Authentication authenticationToken = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> me=userService.getUser(authenticationToken.getName());
+        resultMap.put("success", true);
+        resultMap.put("access_token", jwtUtil.generateToken(me.orElseThrow().getId(), authenticationToken.getName()));
         return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
 
@@ -88,7 +102,7 @@ public class UserController {
         String message=userService.deleteUser();
         if(message.isEmpty()){
             resultMap.put("success", true);
-            resultMap.put("message", "Update success.");
+            resultMap.put("message", "Drop success.");
             return new ResponseEntity<>(resultMap, HttpStatus.OK);
         }else{
             resultMap.put("success", false);

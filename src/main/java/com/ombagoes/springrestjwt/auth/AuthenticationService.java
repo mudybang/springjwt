@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class AuthenticationService {
@@ -25,10 +27,16 @@ public class AuthenticationService {
 
     public String signup(User input) {
         input.setPassword(passwordEncoder.encode(input.getPassword()));
+        Optional<User> user = userRepository.findByEmail(input.getEmail());
+        if (user.isPresent()){
+            return "Username exists";
+        }
         try {
             userRepository.save(input);
-        } catch (Exception e) {
-            return e.getCause().getMessage();
+        }
+        catch (Exception e) {
+            log.info(e.getMessage());
+            return "Signup Failed.";
         }
         return "";
     }

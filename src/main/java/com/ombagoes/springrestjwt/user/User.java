@@ -35,14 +35,14 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     @NotBlank(message = "Password must fill.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character")
+    @Pattern(regexp = "^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,}$", message = "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character")
     private String password;
 
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean enabled;
 
     @JsonIgnoreProperties("users")//avoid looping
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 

@@ -1,6 +1,5 @@
 package com.ombagoes.springrestjwt.role;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ombagoes.springrestjwt.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,6 @@ public class Role{
     private Integer id;
     private String name;
 
-    @JsonIgnoreProperties("roles")//avoid looping
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> users = new ArrayList<>();
 }

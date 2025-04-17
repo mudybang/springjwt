@@ -68,14 +68,14 @@ public class AuthController {
                     "message"  ,  validationMessage
             ),HttpStatus.BAD_REQUEST);
         }
-        Long authenticatedUser = authenticationService.authenticate(request);
-        if(authenticatedUser>0){
+        Long authenticatedUserId = authenticationService.authenticate(request);
+        if(authenticatedUserId>0){
             log.info("success");
             // Generate the token
-            String jwtToken = jwtUtil.generateToken(authenticatedUser, request.getUsername());
+            String jwtToken = jwtUtil.generateToken(authenticatedUserId, request.getUsername());
             return new ResponseEntity<>(Map.of(
                     "success"  , true,
-                    "jwtToken"  , jwtToken,
+                    "access_token"  , jwtToken,
                     "username"  , request.getUsername()
             ),HttpStatus.OK);
         }else{
