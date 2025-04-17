@@ -24,6 +24,6 @@ public class Role{
     private String name;
 
     @JsonIgnoreProperties("roles")//avoid looping
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> users = new ArrayList<>();
 }

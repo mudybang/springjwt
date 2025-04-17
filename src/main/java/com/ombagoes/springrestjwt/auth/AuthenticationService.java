@@ -28,7 +28,7 @@ public class AuthenticationService {
         try {
             userRepository.save(input);
         } catch (Exception e) {
-            return e.getCause().getCause().getMessage();
+            return e.getCause().getMessage();
         }
         return "";
     }
