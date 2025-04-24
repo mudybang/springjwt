@@ -83,16 +83,10 @@ public class UserController {
             resultMap.put("message", validationMessage);
             return new ResponseEntity<>(resultMap, HttpStatus.BAD_REQUEST);
         }else{
-            String message=userService.updateUser(input);
-            if(message.isEmpty()){
-                resultMap.put("success", true);
-                resultMap.put("message", "Update success.");
-                return new ResponseEntity<>(resultMap, HttpStatus.OK);
-            }else{
-                resultMap.put("success", false);
-                resultMap.put("message", message);
-                return new ResponseEntity<>(resultMap, HttpStatus.BAD_REQUEST);
-            }
+            userService.updateUser(input);
+            resultMap.put("success", true);
+            resultMap.put("message", "Update success.");
+            return new ResponseEntity<>(resultMap, HttpStatus.OK);
         }
     }
 

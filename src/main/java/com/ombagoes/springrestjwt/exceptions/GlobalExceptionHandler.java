@@ -1,8 +1,10 @@
 package com.ombagoes.springrestjwt.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -45,6 +47,18 @@ public class GlobalExceptionHandler {
             errorDetail.setProperty("description", "Unknown internal server error.");
         }
 
+        return errorDetail;
+    }
+    @ExceptionHandler(UserExistException.class)
+    public ProblemDetail handleUserNotFound(UserExistException ex) {
+        ProblemDetail errorDetail = null;
+        errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(409), ex.getMessage());
+        return errorDetail;
+    }
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail handleUserNotFound(ResourceNotFoundException ex) {
+        ProblemDetail errorDetail = null;
+        errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(404), ex.getMessage());
         return errorDetail;
     }
 }

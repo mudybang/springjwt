@@ -1,5 +1,6 @@
 package com.ombagoes.springrestjwt.auth;
 
+import com.ombagoes.springrestjwt.exceptions.UserExistException;
 import com.ombagoes.springrestjwt.role.RoleRepository;
 import com.ombagoes.springrestjwt.user.User;
 import com.ombagoes.springrestjwt.user.UserRepository;
@@ -29,7 +30,7 @@ public class AuthenticationService {
         input.setPassword(passwordEncoder.encode(input.getPassword()));
         Optional<User> user = userRepository.findByEmail(input.getEmail());
         if (user.isPresent()){
-            return "Username exists";
+            throw new UserExistException("User Exist.");
         }
         try {
             userRepository.save(input);

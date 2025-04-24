@@ -1,11 +1,13 @@
 package com.ombagoes.springrestjwt.user;
 
+import com.ombagoes.springrestjwt.exceptions.ResourceNotFoundException;
 import com.ombagoes.springrestjwt.user.dtos.UpdateProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +23,7 @@ public class UserService {
     public Optional<User> getUser(String email) {
         return userRepository.findByEmail(email);
     }
-    public String updateUser(UpdateProfileDto input) {
+    public void updateUser(UpdateProfileDto input) {
         Authentication authenticationToken = SecurityContextHolder.getContext().getAuthentication();
         String username = authenticationToken.getName();
         Optional<User> userData=getUser(username);
@@ -32,11 +34,9 @@ public class UserService {
             try {
                 userRepository.save(_user);
             } catch (Exception e) {
-                return e.getCause().getCause().getMessage();
+                throw new ResourceNotFoundException(e.getMessage());
             }
-            return "";
         }
-        return "User not exist.";
     }
     public String deleteUser() {
         Authentication authenticationToken = SecurityContextHolder.getContext().getAuthentication();
